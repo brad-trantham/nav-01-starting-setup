@@ -1,30 +1,39 @@
 import React from 'react'
-import {View, Text, Button, StyleSheet} from 'react-native'
+import {View, Text, FlatList, StyleSheet} from 'react-native'
 
-import { CATEGORIES } from '../data/dummy-data'
+import { CATEGORIES, MEALS } from '../data/dummy-data'
+import MealItem from '../components/MealItem'
 
 const CategoryMealsScreen = props => {
+    const renderMealItem = itemData => {
+    return <MealItem title={itemData.item.title} duration={itemData.item.duration}
+                     complexity={itemData.item.complexity} affordability={itemData.item.affordability} 
+                     image={itemData.item.imageUrl}
+                     onSelectMeal={()=>{}}></MealItem>
+    }    
+
     const catId = props.navigation.getParam('categoryId')
     const selectedCategory = CATEGORIES.find(cat => cat.id === catId)
 
+    const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0)
+
     return(
         <View style={styles.screen}>
-            <Text>The Category Meals Screen!</Text>
-            <Text>{selectedCategory.title}</Text>
-            <Button title="Go to Details" onPress={() =>
-                // you can also use navigation.push(), which can be handy 
-                // for something like directory navigation when you need
-                // to push the same screen with different content
-                props.navigation.navigate({routeName: 'MealDetail'})
-            }/>
-            <Button title="Go Back" onPress={() => {
-                // navigation.pop() also works the same in a stacknavigator
-                // goBack() is more universal when you start using other
-                // navigators
-                props.navigation.goBack()
-            }}/>
+            <FlatList data={displayedMeals} renderItem={renderMealItem} style={{width: '100%'}}/>
         </View>
     )
+}
+
+// if navigationOptions is set to a function rather than a property
+// then react native will automatically call that function for you
+// with a navigationData parameter
+CategoryMealsScreen.navigationOptions = navigationData => {
+    const catId = navigationData.navigation.getParam('categoryId')
+    const selectedCategory = CATEGORIES.find(cat => cat.id === catId)
+
+    return {
+        headerTitle: selectedCategory.title
+    }
 }
 
 const styles = StyleSheet.create({
