@@ -86,12 +86,12 @@ const MealsFavTabNavigator = Platform.OS === 'android'
 const FiltersNavigator = createStackNavigator({
     Filters : FiltersScreen
 }, 
-{   
+   
 //     navigationOptions: {
 //     drawerLabel: 'Filters!'
 // },
-    defaultNavigationOptions: defaultStackNavOptions
-})
+    defaultStackNavOptions
+)
 
 const MainNavigator = createDrawerNavigator({
     MealsFavs: {screen: MealsFavTabNavigator,
