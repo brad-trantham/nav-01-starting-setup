@@ -1,10 +1,15 @@
 import React from 'react'
 import { View, FlatList, StyleSheet } from 'react-native'
+import { useSelector } from 'react-redux'
 
 import MealItem from './MealItem'
 
 const MealList = props => {
+    // hooks must be used in the root functional component
+    // this wouldn't work inside renderMealItem
+    const favoriteMeals = useSelector(state => state.meals.favoriteMeals)
     const renderMealItem = itemData => {
+        const isFavorite = favoriteMeals.some(meal => meal.id === itemData.item.id)
         return <MealItem title={itemData.item.title} duration={itemData.item.duration}
                          complexity={itemData.item.complexity} affordability={itemData.item.affordability} 
                          image={itemData.item.imageUrl}
@@ -12,7 +17,8 @@ const MealList = props => {
                              props.navigation.navigate({routeName: 'MealDetail',
                                                         params: {
                                                             mealId: itemData.item.id,
-                                                            mealTitle: itemData.item.title
+                                                            mealTitle: itemData.item.title,
+                                                            isFav: isFavorite
                                                         }})
                          }}></MealItem>
         }   

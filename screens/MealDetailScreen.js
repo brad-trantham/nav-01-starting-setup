@@ -14,9 +14,11 @@ const ListItem = props => {
 }
 
 const MealDetailScreen = props => {
-    const availableMeals = useSelector(state => state.meals.meals)
+    const availableMeals = useSelector(state => state.meals.meals)    
     const mealId = props.navigation.getParam('mealId')
     const selectedMeal = availableMeals.find(meal => meal.id === mealId)
+    const currentMealIsFavorite = useSelector(state => 
+        state.meals.favoriteMeals.some(meal => meal.id === mealId))
 
     const dispatch = useDispatch()
 
@@ -30,6 +32,10 @@ const MealDetailScreen = props => {
     useEffect(()=>{
         props.navigation.setParams({toggleFav: toggleFavoriteHandler})
     }, [toggleFavoriteHandler])
+
+    useEffect(()=>{
+         props.navigation.setParams({isFav: currentMealIsFavorite})
+    }, [currentMealIsFavorite])
 
     // useEffect(()=>{        
     //     // changing props like this without useEffect causes the component to be re-rendered,
@@ -59,11 +65,12 @@ MealDetailScreen.navigationOptions = (navigationData) => {
     const mealId = navigationData.navigation.getParam('mealId')
     const mealTitle = navigationData.navigation.getParam('mealTitle')
     const toggleFavorite = navigationData.navigation.getParam('toggleFav')
+    const isFavorite = navigationData.navigation.getParam('isFav')
     // const selectedMeal = MEALS.find(meal => meal.id === mealId)    
     return {
         headerTitle: mealTitle,
         headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
-            <Item title='Favorite' iconName='ios-star' onPress={toggleFavorite}/>
+            <Item title='Favorite' iconName={isFavorite ? 'ios-star' : 'ios-star-outline'} onPress={toggleFavorite}/>
         </HeaderButtons>
     }
 }
