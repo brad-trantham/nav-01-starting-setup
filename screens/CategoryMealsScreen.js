@@ -1,13 +1,17 @@
 import React from 'react'
+// you can also import connect but the syntax is more verbose
+import { useSelector } from 'react-redux'
 
-import { CATEGORIES, MEALS } from '../data/dummy-data'
+import { CATEGORIES } from '../data/dummy-data'
 import MealList from '../components/MealList'
 
 const CategoryMealsScreen = props => {
     const catId = props.navigation.getParam('categoryId')
     const selectedCategory = CATEGORIES.find(cat => cat.id === catId)
 
-    const displayedMeals = MEALS.filter(meal => meal.categoryIds.indexOf(catId) >= 0)
+    const availableMeals = useSelector(state => state.meals.filteredMeals)
+
+    const displayedMeals = availableMeals.filter(meal => meal.categoryIds.indexOf(catId) >= 0)
 
     return(
         // navigation is only available to screens directly loaded by the navigator,
