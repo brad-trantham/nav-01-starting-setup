@@ -1,10 +1,11 @@
-import React, {useEffect} from 'react'
+import React, {useEffect, useCallback} from 'react'
 import {ScrollView, View, Image, Text, Button, StyleSheet} from 'react-native'
 import {HeaderButtons, Item} from 'react-navigation-header-buttons'
-import {useSelector} from 'react-redux'
+import {useSelector, useDispatch} from 'react-redux'
 
 import HeaderButton from '../components/HeaderButton'
 import DefaultText from '../components/DefaultText'
+import { toggleFavorite } from '../store/actions/meals'
 
 const ListItem = props => {
     return <View style={styles.listItem}>
@@ -17,12 +18,25 @@ const MealDetailScreen = props => {
     const mealId = props.navigation.getParam('mealId')
     const selectedMeal = availableMeals.find(meal => meal.id === mealId)
 
-    useEffect(()=>{        
-        // changing props like this without useEffect causes the component to be re-rendered,
-        // so you end up in an infinite loop of re-rendering if you don't
-        // handle that with the useEffect hook (see lecture 148)
-        props.navigation.setParams({mealTitle: selectedMeal.title})
-    }, [selectedMeal])
+    const dispatch = useDispatch()
+
+    // we define this as a callback to avoid the function being recreated,
+    // which avoid the useEffect function being recreated since this is
+    // its dependency
+    const toggleFavoriteHandler = useCallback(() => {
+        dispatch(toggleFavorite(mealId))
+    }, [dispatch, mealId])
+
+    useEffect(()=>{
+        props.navigation.setParams({toggleFav: toggleFavoriteHandler})
+    }, [toggleFavoriteHandler])
+
+    // useEffect(()=>{        
+    //     // changing props like this without useEffect causes the component to be re-rendered,
+    //     // so you end up in an infinite loop of re-rendering if you don't
+    //     // handle that with the useEffect hook (see lecture 148)
+    //     props.navigation.setParams({mealTitle: selectedMeal.title})
+    // }, [selectedMeal])
 
     return(
         <ScrollView>
@@ -44,13 +58,12 @@ MealDetailScreen.navigationOptions = (navigationData) => {
     // hooks can only be used inside of functional components so we can't use useSelector here
     const mealId = navigationData.navigation.getParam('mealId')
     const mealTitle = navigationData.navigation.getParam('mealTitle')
+    const toggleFavorite = navigationData.navigation.getParam('toggleFav')
     // const selectedMeal = MEALS.find(meal => meal.id === mealId)    
     return {
         headerTitle: mealTitle,
         headerRight: () => <HeaderButtons HeaderButtonComponent={HeaderButton}>
-            <Item title='Favorite' iconName='ios-star' onPress={()=>{
-                console.log('Marked as favorite!')
-            }}/>
+            <Item title='Favorite' iconName='ios-star' onPress={toggleFavorite}/>
         </HeaderButtons>
     }
 }
